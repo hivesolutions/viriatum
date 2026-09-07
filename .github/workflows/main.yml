@@ -73,7 +73,7 @@ jobs:
     timeout-minutes: 30
     strategy:
       matrix:
-        gcc-version: [11, 12, 13, 14, 15, 16]
+        gcc-version: [12, 13, 14, 15, 16]
         cmake-version: ["3.25.0"]
         cmake-type: ["binary"]
     runs-on: ubuntu-latest

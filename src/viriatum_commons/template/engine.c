@@ -75,16 +75,10 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
     /* allocates space for the file */
     FILE *file;
 
-    /* allocates space for the current (character) for reading
-    and for the ahead character for look ahead */
-    char current = '\0';
-    char ahead = '\0';
-
-    /* allocates the space for the look ahead valid flag */
-    unsigned char ahead_set = 0;
-
     /* allocates the space for the variable that will hold
-    the size of the file to be parsed */
+    the size of the file to be parsed and for the position
+    of the end of it, as the stream itself reports it */
+    long file_length;
     size_t file_size;
 
     /* allocates the buffer that will hold the contents
@@ -92,22 +86,10 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
     end of the parsing */
     unsigned char *file_buffer;
 
-    /* allocates space for the buffer that will serve as
-    cache for the reading of the template file, this has
-    serious implications on the performance of the file */
-    char _file_buffer[ENGINE_BUFFER_SIZE];
-
-    /* allocates the mark variables used to locate
-    the part of context changing during the parsing */
-    unsigned char *pointer = 0;
-    unsigned char *text_end_mark = 0;
-    unsigned char *tag_end_mark = 0;
-    unsigned char *tag_name_mark = 0;
-    unsigned char *parameter_mark = 0;
-    unsigned char *parameter_value_mark = 0;
-
-    /* allocates and starts the state for the template parsing */
-    enum template_engine_state_e state = TEMPLATE_ENGINE_NORMAL;
+    /* allocates space for the number of bytes that the reading
+    of the file hands back and for the result of the parsing */
+    size_t number_bytes;
+    ERROR_CODE error_code;
 
     /* opens the file */
     FOPEN(&file, (char *) file_path, "rb");
@@ -118,34 +100,96 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
         RAISE_NO_ERROR;
     }
 
-    /* then sets the buffer on the file for reading, this
-    operation has serious implications in the file access
-    performance (buffered reading )*/
-    setvbuf(file, _file_buffer, _IOFBF, ENGINE_BUFFER_SIZE);
-
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
-    position (for further reading) */
-    fseek(file, 0, SEEK_END);
-    file_size = ftell(file);
+    position (for further reading), a stream that cannot be
+    taken to its end or is unable to say where that is, as
+    the one of a directory, cannot be read whole */
+    file_length = fseek(file, 0, SEEK_END) == 0 ? ftell(file) : -1;
     fseek(file, 0, SEEK_SET);
+    if(file_length < 0) {
+        fclose(file);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading from file"
+        );
+    }
+    file_size = (size_t) file_length;
 
     /* allocates the buffer that will hold the complete
-    template file (this allocation may be giant), this is
-    necessary for the correct execution of the parser, uses
-    the file buffer reference as the (initial) pointer value */
-    file_buffer = (void *) MALLOC(file_size);
-    pointer = file_buffer;
+    template file (this allocation may be giant) and reads
+    the file into it whole, a single operation where the
+    walking of the stream a character at a time costs a
+    call into the library for every one of them, one byte
+    more than the file holds so that a file with nothing
+    in it still hands the parser a buffer of its own */
+    file_buffer = (unsigned char *) MALLOC(file_size + 1);
+    number_bytes = fread(file_buffer, 1, file_size, file);
+
+    /* closes the file, the contents of it are in memory */
+    fclose(file);
+
+    /* in case the number of read bytes is not the same as
+    the total bytes in file the parser would run over what
+    the buffer happens to hold past them (error) */
+    if(number_bytes != file_size) {
+        FREE(file_buffer);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading from file"
+        );
+    }
+
+    /* runs the parser over the buffer that holds the file and
+    releases the buffer, whatever the parsing came to */
+    error_code = process_buffer_template_engine(
+        template_engine,
+        template_settings,
+        file_buffer,
+        file_size
+    );
+    FREE(file_buffer);
+
+    /* in case the parsing raised an error it is raised again
+    now that the buffer has been released */
+    if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+
+    /* raise no error */
+    RAISE_NO_ERROR;
+}
+
+ERROR_CODE process_buffer_template_engine(struct template_engine_t *template_engine, struct template_settings_t *template_settings, unsigned char *buffer, size_t size) {
+    /* allocates space for the current (character) for reading
+    and for the ahead character for look ahead */
+    char current = '\0';
+    char ahead = '\0';
+
+    /* allocates the space for the look ahead valid flag */
+    unsigned char ahead_set = 0;
+
+    /* allocates the mark variables used to locate the part
+    of context changing during the parsing, the pointer walks
+    the buffer and the marks point into it, so that nothing
+    is ever copied out of it during the parsing */
+    unsigned char *pointer = buffer;
+    unsigned char *text_end_mark = 0;
+    unsigned char *tag_end_mark = 0;
+    unsigned char *tag_name_mark = 0;
+    unsigned char *parameter_mark = 0;
+    unsigned char *parameter_value_mark = 0;
+
+    /* allocates and starts the state for the template parsing */
+    enum template_engine_state_e state = TEMPLATE_ENGINE_NORMAL;
 
     TEMPLATE_MARK(text_end);
     TEMPLATE_CALLBACK(text_begin);
 
     /* iterates continuously too run the parser
-    over the complete set of file contents */
+    over the complete set of buffer contents */
     while(TRUE) {
         /* in case the look ahead mode is set, should
         read from the look ahead instead of the normal
-        file reading */
+        buffer reading */
         if(ahead_set) {
             /* sets the current read character as the look
             ahead character and unsets the ahead set flag */
@@ -154,16 +198,17 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
         }
         /* otherwise it must be a normal reading */
         else {
-            /* retrieves the current character
-            from the file stream */
-            current = _getc_template_engine(file, &pointer, &file_size);
-        }
+            /* in case nothing remains in the buffer the parsing
+            is over, every character of it has been through the
+            parser by now, the last one of them included */
+            if(size == 0) {
+                /* breaks the cycle (end of parsing) */
+                break;
+            }
 
-        /* in case the end of file has been found, or
-        the file size is zero (breaks) */
-        if(current == EOF || file_size == 0) {
-            /* breaks the cycle (end of parsing) */
-            break;
+            /* retrieves the current character
+            from the buffer */
+            current = _getc_template_engine(&pointer, &size);
         }
 
         /* switches over the state to determine the appropriate
@@ -190,12 +235,16 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
                     state = TEMPLATE_ENGINE_OPEN;
 
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead = _getc_template_engine(&pointer, &size);
                     ahead_set = 1;
 
                     if(ahead == '/') {
                         TEMPLATE_CALLBACK(tag_close_begin);
                         ahead_set = 0;
+
+                        /* marks the tag name past the slash, so that
+                        the name of a closing tag never carries it */
+                        TEMPLATE_MARK(tag_name);
                     }
                 } else {
                     /* resets the state to the "normal" */
@@ -207,7 +256,7 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
             case TEMPLATE_ENGINE_OPEN:
                 if(current == '/') {
                     /* reads ahead and sets the ahead set flag */
-                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead = _getc_template_engine(&pointer, &size);
                     ahead_set = 1;
 
                     if(ahead == '}') {
@@ -215,6 +264,11 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
                         /* unsets the ahead set flag */
                         ahead_set = 0;
+
+                        /* calls the tag name callback, the name of a
+                        tag that closes right after it ends at the slash
+                        and is reported the way any other name is */
+                        TEMPLATE_CALLBACK_DATA_N(tag_name, 2);
 
                         /* marks the text end */
                         TEMPLATE_MARK(text_end);
@@ -229,6 +283,10 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
                 if(current == '}') {
                     state = TEMPLATE_ENGINE_NORMAL;
+
+                    /* calls the tag name callback, the name of a tag
+                    that carries no parameters ends at the brace */
+                    TEMPLATE_CALLBACK_DATA_BACK(tag_name);
 
                     TEMPLATE_MARK(text_end);
 
@@ -252,7 +310,7 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
             case TEMPLATE_ENGINE_PARAMETERS:
                 if(current == '/') {
-                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead = _getc_template_engine(&pointer, &size);
                     ahead_set = 1;
 
                     if(ahead == '}') {
@@ -291,7 +349,7 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
             case TEMPLATE_ENGINE_PARAMETER:
                 if(current == '/') {
-                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead = _getc_template_engine(&pointer, &size);
                     ahead_set = 1;
 
                     if(ahead == '}') {
@@ -333,7 +391,7 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
             case TEMPLATE_ENGINE_PARAMETER_VALUE:
                 if(current == '/') {
-                    ahead = _getc_template_engine(file, &pointer, &file_size);
+                    ahead = _getc_template_engine(&pointer, &size);
                     ahead_set = 1;
 
                     if(ahead == '}') {
@@ -387,51 +445,38 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
         }
     }
 
-    /* in case the current state is engine
-    normal (there must be text to be flushed) */
-    if(state == TEMPLATE_ENGINE_NORMAL) {
+    /* in case the current state is engine normal (there
+    must be text to be flushed), a dollar that the buffer
+    ends on opens no tag and is the last character of that
+    text rather than the start of something else */
+    if(state == TEMPLATE_ENGINE_NORMAL || state == TEMPLATE_ENGINE_DOLLAR) {
         /* calls the text end callback */
         TEMPLATE_CALLBACK_DATA(text_end);
     }
-
-    /* closes the file */
-    fclose(file);
-
-    /* releases the file buffer */
-    FREE(file_buffer);
 
     /* raise no error */
     RAISE_NO_ERROR;
 }
 
-char _getc_template_engine(FILE *file, unsigned char **pointer, size_t *size) {
+char _getc_template_engine(unsigned char **pointer, size_t *size) {
     /* allocates space for the current character
     to be retrieve in the function */
     char current;
 
-    /* in case the size is already zero (nothing remaining) */
-    if(size == 0) {
+    /* in case the size is already zero (nothing remaining)
+    nothing is read past the end of the buffer and the pointer
+    is left exactly where it stands */
+    if(*size == 0) {
         /* returns invalid */
-        return 0;
+        return EOF;
     }
 
-    /* retrieves the current character
-    from the file stream */
-    current = getc(file);
-
-    /* in case the current retrieved character
-    is an end of file nothing should be updated */
-    if(current == EOF) {
-        /* returns the character immediately */
-        return current;
-    }
-
-    /* updates the file buffer (from pointer) with the current
-    character and increments the pointer reference */
-    **pointer = current;
+    /* retrieves the current character from the buffer
+    and increments the pointer reference past it */
+    current = (char) **pointer;
     (*pointer)++;
 
-    /* decrements the file size */
+    /* decrements the (remaining) size */
     (*size)--;
 
     /* returns the current character */

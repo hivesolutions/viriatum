@@ -84,6 +84,22 @@ static ERROR_CODE _on_write_polling_test(struct connection_t *connection) {
     RAISE_NO_ERROR;
 }
 
+/* the number of values whose sending has been reported and the
+order in which it was, each of them written as the digit it carries,
+which is how a test tells that the values of a queue went out in turn */
+static size_t _sent_count = 0;
+static char _sent_order[8] = "";
+
+static ERROR_CODE _on_sent_polling_test(struct connection_t *connection, struct data_t *data, void *parameters) {
+    /* records the value as sent, in its turn, so that a test is able
+    to tell that the values of the queue went out in order and that
+    the callback of every one of them was called */
+    _sent_order[_sent_count] = (char) ('0' + (int) (size_t) parameters);
+    _sent_count++;
+    _sent_order[_sent_count] = '\0';
+    RAISE_NO_ERROR;
+}
+
 /* builds a pair of connected sockets over the loopback, the accepted
 end of it being the one that the polling is handed and the connected
 one the end that a test writes into so that something is waiting */
@@ -320,6 +336,156 @@ const char *test_polling_write(void) {
     SOCKET_CLOSE(server);
     SOCKET_CLOSE(client);
     _delete_polling_test(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+/**
+ * Reads from the provided socket the number of bytes asked for, the
+ * loopback of some of the platforms delivering them a moment after
+ * they were sent, so a read that comes back with nothing or with only
+ * a part of them is tried again a bounded number of times.
+ *
+ * @param socket_handle The socket to be read from.
+ * @param buffer The buffer the bytes are read into.
+ * @param size The number of bytes to be read.
+ * @return The number of bytes that were read.
+ */
+static size_t _receive_polling_test(SOCKET_HANDLE socket_handle, unsigned char *buffer, size_t size) {
+    long read_bytes;
+    size_t total = 0;
+    size_t attempt;
+
+    for(attempt = 0; attempt < 1000 && total < size; attempt++) {
+        read_bytes = (long) SOCKET_RECEIVE(socket_handle, (char *) buffer + total, size - total, 0);
+        if(read_bytes > 0) {
+            total += (size_t) read_bytes;
+            continue;
+        }
+        SLEEP(1);
+    }
+
+    return total;
+}
+
+const char *test_polling_gather(void) {
+    /* allocates space for the data of the socket layer, for the pair
+    of sockets, for the connection built over one of them, for the value
+    at the head of its queue, for the buffers the other end reads into,
+    for the value that is larger than the socket takes at once and for
+    the last bytes that arrived */
+    SOCKET_DATA socket_data;
+    SOCKET_HANDLE server;
+    SOCKET_HANDLE client;
+    struct connection_t *connection;
+    struct data_t *data;
+    unsigned char buffer[64];
+    unsigned char drain[65536];
+    unsigned char last[4];
+    unsigned char *large;
+    size_t large_size = 1 << 24;
+    size_t total = 0;
+    size_t attempt = 0;
+    size_t index;
+    long read_bytes;
+    ERROR_CODE error;
+
+    /* readies the socket layer the way the opening of a service does,
+    no service is opened by this test and a pair of sockets is not to
+    be had on some of the platforms before that is done */
+    SOCKET_INITIALIZE(&socket_data);
+    _create_pair_polling_test(&server, &client, POLLING_TEST_PORT + 10);
+    create_connection(&connection, server);
+    connection->status = STATUS_OPEN;
+
+    /* points the registration of the writing at a stub, the sending
+    is driven by hand rather than by a mechanism, and the closing of
+    the connection at another, so that a sending that fails is reported
+    by the test rather than followed into a closing that is not there */
+    connection->register_write = register_write_test_connection;
+    connection->unregister_write = register_write_test_connection;
+    connection->close_connection = close_test_connection;
+    reset_closed_test_connection();
+
+    /* the headers of a response and the payload that follows them are
+    queued apart and go out together, in the order they were queued and
+    with the callback of each of them called in its turn */
+    _sent_count = 0;
+    _sent_order[0] = '\0';
+    write_connection_c(connection, (unsigned char *) "HEAD", 4, _on_sent_polling_test, (void *) 1, FALSE);
+    write_connection_c(connection, (unsigned char *) "BODY", 4, _on_sent_polling_test, (void *) 2, FALSE);
+    error = write_handler_stream_io(connection);
+    V_ASSERT(!IS_ERROR_CODE(error));
+    V_ASSERT_EQ_U(connection->write_queue->size, 0);
+    V_ASSERT_EQ_S(_sent_order, "12");
+
+    V_ASSERT_EQ_U(_receive_polling_test(client, buffer, 8), 8);
+    V_ASSERT_MEM(buffer, "HEADBODY", 8);
+
+    /* a value larger than the socket takes at once goes out in part
+    and the rest of it waits, together with whatever was queued behind
+    it, the value being shrunk to what is left rather than sent again,
+    the sending reports that the socket would block from then on, the
+    socket of some of the platforms takes the whole of it in one go
+    and is left with nothing waiting instead, whatever is left waiting
+    together with what went out of it must add up to the whole value */
+    large = (unsigned char *) MALLOC(large_size);
+    memset(large, 'x', large_size);
+    write_connection_c(connection, large, (unsigned int) large_size, NULL, NULL, TRUE);
+    write_connection_c(connection, (unsigned char *) "TAIL", 4, _on_sent_polling_test, (void *) 3, FALSE);
+    error = write_handler_stream_io(connection);
+    V_ASSERT(error == 0 || error == 2);
+    if(error == 2) {
+        V_ASSERT(connection->write_queue->size > 0);
+        V_ASSERT(connection->write_queue->size <= 2);
+        peek_value_linked_list(connection->write_queue, (void **) &data);
+        V_ASSERT(data->size <= data->size_base);
+        V_ASSERT_EQ_U(data->size + (size_t) (data->data - data->data_base), data->size_base);
+    } else {
+        V_ASSERT_EQ_U(connection->write_queue->size, 0);
+    }
+
+    /* the other end is drained and the sending driven again for as
+    long as something is left, every byte arrives in its order and the
+    ones that close the whole of it belong to the value queued last, a
+    moment in which nothing arrives and nothing more may be sent is
+    given to the loopback, which delivers a moment after the sending
+    on some of the platforms, a bounded number of times */
+    memset(last, 0, sizeof(last));
+    while(total < large_size + 4) {
+        read_bytes = (long) SOCKET_RECEIVE(client, (char *) drain, sizeof(drain), 0);
+        if(read_bytes > 0) {
+            if(read_bytes >= 4) {
+                memcpy(last, drain + read_bytes - 4, 4);
+            } else {
+                for(index = 0; index < (size_t) read_bytes; index++) {
+                    memmove(last, last + 1, 3);
+                    last[3] = drain[index];
+                }
+            }
+            total += (size_t) read_bytes;
+            attempt = 0;
+            continue;
+        }
+        if(connection->write_queue->size > 0) {
+            error = write_handler_stream_io(connection);
+            V_ASSERT(error != 1);
+        }
+        SLEEP(1);
+        attempt++;
+        V_ASSERT(attempt < 5000);
+    }
+    V_ASSERT_EQ_U(total, large_size + 4);
+    V_ASSERT_MEM(last, "TAIL", 4);
+    V_ASSERT_EQ_S(_sent_order, "123");
+    V_ASSERT_EQ_U(get_closed_test_connection(), 0);
+
+    SOCKET_CLOSE(server);
+    SOCKET_CLOSE(client);
+    delete_connection(connection);
+    SOCKET_FINISH();
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */

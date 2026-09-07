@@ -117,6 +117,7 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
     create_linked_list(&service->connections_list);
     create_linked_list(&service->modules_list);
     create_hash_map(&service->http_handlers_map, 0);
+    create_template_cache(&service->template_cache);
 
     /* sets the service in the service pointer */
     *service_pointer = service;
@@ -140,7 +141,10 @@ void delete_service(struct service_t *service) {
     }
 
     /* deletes the various internal structures associated
-    with the service avoiding any memory leak */
+    with the service avoiding any memory leak, the templates
+    that were being kept parsed are released along with the
+    files that the keeping of them held open */
+    delete_template_cache(service->template_cache);
     delete_hash_map(service->http_handlers_map);
     delete_linked_list(service->modules_list);
     delete_linked_list(service->connections_list);
@@ -175,6 +179,7 @@ void create_service_options(struct service_options_t **service_options_pointer) 
     service_options->www_root[0] = '\0';
     service_options->use_template = 0;
     service_options->access_log = 1;
+    service_options->error_log = 1;
     service_options->default_virtual_host = NULL;
     service_options->index_count = 0;
 
@@ -350,11 +355,13 @@ ERROR_CODE load_options_service(struct service_t *service, struct hash_map_t *ar
     RAISE_NO_ERROR;
 }
 
-void _bundled_path_service(unsigned char *path, const char *name, const char *fallback) {
+ERROR_CODE _bundled_path_service(unsigned char *path, const char *name, const char *fallback) {
     /* allocates space for the flag that tells a directory apart from
-    whatever else may be sitting under the same name and resolves the
-    directory that the binary of the process sits in */
+    whatever else may be sitting under the same name, for the result
+    of the asking about it and resolves the directory that the binary
+    of the process sits in */
     unsigned int is_directory = 0;
+    ERROR_CODE error_code;
     const char *base_path = get_base_path();
 
     /* builds the path that an unpacked archive would carry, which is
@@ -367,11 +374,15 @@ void _bundled_path_service(unsigned char *path, const char *name, const char *fa
             (char *) path, VIRIATUM_MAX_PATH_SIZE,
             "%s" VIRIATUM_PATH_SEPARATOR "%s", base_path, name
         );
-        is_directory_file((char *) path, &is_directory);
-        if(is_directory) { return; }
+        error_code = is_directory_file((char *) path, &is_directory);
+        if(IS_ERROR_CODE(error_code)) { RAISE_AGAIN(error_code); }
+        if(is_directory) { RAISE_NO_ERROR; }
     }
 
     SPRINTF((char *) path, VIRIATUM_MAX_PATH_SIZE, "%s", fallback);
+
+    /* raises no error */
+    RAISE_NO_ERROR;
 }
 
 ERROR_CODE calculate_options_service(struct service_t *service) {
@@ -524,6 +535,7 @@ ERROR_CODE debug_options_service(struct service_t *service) {
     V_DEBUG_F("  modules_path         := %s\n", options->modules_path);
     V_DEBUG_F("  use_template         := %s\n", options->use_template ? "on" : "off");
     V_DEBUG_F("  access_log           := %s\n", options->access_log ? "on" : "off");
+    V_DEBUG_F("  error_log            := %s\n", options->error_log ? "on" : "off");
     V_DEBUG_F("  default_virtual_host := %s\n", options->default_virtual_host != NULL ? "(set)" : "(null)");
     V_DEBUG_F("  index_count          := %lu\n", (unsigned long) options->index_count);
     for(index = 0; index < options->index_count; index++) {
@@ -2630,6 +2642,11 @@ ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *a
     sets the access log (boolean) value for the service */
     get_value_string_sort_map(general, (unsigned char *) "access_log", &value);
     if(value != NULL) { service_options->access_log = (unsigned char) atob(value); }
+
+    /* tries to retrieve the error log argument from the arguments map, then
+    sets the error log (boolean) value for the service */
+    get_value_string_sort_map(general, (unsigned char *) "error_log", &value);
+    if(value != NULL) { service_options->error_log = (unsigned char) atob(value); }
 
     /* tries to retrieve the www root argument from the arguments map, then
     sets the www root override for the contents path in service options */

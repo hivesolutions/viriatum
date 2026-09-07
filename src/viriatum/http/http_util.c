@@ -534,8 +534,13 @@ ERROR_CODE write_http_error_a(
     size = size == 0 ? VIRIATUM_HTTP_SIZE : size;
 
     /* logs the HTTP error being sent to the client, using the warning
-    level to ensure visibility in both debug and release builds */
-    V_WARNING_F("HTTP error %d %s\n", error_code, error_message);
+    level to ensure visibility in both debug and release builds, the
+    writing of it is a call into the kernel for every error that is
+    answered and so it is only ever written when the service has been
+    asked for it, the very way the line of a request is */
+    if(options->error_log) {
+        V_WARNING_F("HTTP error %d %s\n", error_code, error_message);
+    }
 
 #ifndef VIRIATUM_DEBUG
     /* sets the error description as null in order to avoid any
@@ -576,12 +581,27 @@ ERROR_CODE write_http_error_a(
             assign_string_template_handler(template_handler, (unsigned char *) "error_description", error_description);
         }
 
-        /* processes the file as a template handler, at this point
-        the output buffer of the template engine should be populated
-        with the complete header information, the appropriate header
-        writing method is chosen based on the existence or not of
-        the realm authorization field */
-        process_template_handler(template_handler, template_path);
+        /* processes the file as a template handler, out of the cache
+        of the service so that the file is only ever parsed when it
+        has changed, at this point the output buffer of the template
+        engine should be populated with the complete header information,
+        the appropriate header writing method is chosen based on the
+        existence or not of the realm authorization field */
+        if(error_description == NULL) {
+            /* a page that carries nothing but the code and the message
+            of the error is the very same page every time it is asked
+            for, so it is rendered once and held under the two of them
+            for as long as the template stands as it was parsed */
+            SPRINTF(_error_description, sizeof(_error_description), "%d %s", error_code, error_message);
+            process_page_template_handler(
+                template_handler,
+                service->template_cache,
+                template_path,
+                (unsigned char *) _error_description
+            );
+        } else {
+            process_cache_template_handler(template_handler, service->template_cache, template_path);
+        }
         if(template_handler->string_value == NULL || template_handler->string_value[0] == '\0') {
             V_WARNING_F("Template file not found or empty '%s', falling back to text mode\n", template_path);
             delete_template_handler(template_handler);

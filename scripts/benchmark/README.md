@@ -42,6 +42,7 @@ The values below are the ones that actually decide the comparison. Everything el
 | --- | --- | --- | --- | --- | --- | --- |
 | Worker count | `WORKERS` | `worker_processes` | default | `nbthread` | `--workers` | `--workers` |
 | Access logging | `access_log off` | `access_log off` | `output discard` | `log /dev/null` | `/dev/null` | `--no-access-log` |
+| Error logging | `error_log off` | `error_log crit` | `output discard` | `log /dev/null` | `/dev/null` | `--log-level critical` |
 | Kernel file sending | none | `sendfile off` | default | n/a | n/a | n/a |
 | Compression | none | `gzip off` | not enabled | n/a | n/a | n/a |
 | Keep-alive idle | default | `65s` | `idle 65s` | `65s` | `--keep-alive 65` | default |
@@ -55,6 +56,8 @@ A few of these deserve their reasoning written down.
 **`keepalive_requests` is raised well past its default.** nginx closes a connection after a thousand requests by default and Viriatum does not close one at all, and that difference alone shows up as a gap that has nothing to do with the serving.
 
 **Viriatum's request log is turned off through `access_log`, the way every reference turns its own off.** The server writes a line per request and leaving it on while the references have theirs off was measured to cost the subject about 6% on the small static workload. The output of the process is still sent to the sink on top of that, so that anything else it writes never reaches a disk during a measurement.
+
+**The line written per error is turned off through `error_log` for the same reason.** nginx is held at the critical level and writes nothing for a request that fails, where the subject wrote a warning for every one of them, which a profile of the error page put at about a tenth of the plain one.
 
 **The Python references are given the shape they are fastest in, not the one that mirrors the subject.** Viriatum's embedded server holds every connection on the loop of a single process. gunicorn's default worker answers one request at a time and loses every connection past the worker count; measured across its shapes it is fastest at `gthread` with the worker count of the subject and 32 threads, and that is what it is given. A reference driven in a shape it was never meant for reports the shape and never the reference.
 

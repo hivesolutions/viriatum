@@ -486,6 +486,15 @@ typedef struct service_t {
     struct hash_map_t *http_handlers_map;
 
     /**
+     * The templates that the service is keeping parsed,
+     * the pages that are built out of one, the listing
+     * of a directory and the error page among them, cost
+     * only their rendering for as long as the file of the
+     * template stands as it was parsed.
+     */
+    struct template_cache_t *template_cache;
+
+    /**
      * Buffer used as static reference to the
      * value to be returned in the retrieval of
      * the uptime function.
@@ -672,6 +681,15 @@ typedef struct service_options_t {
      * kind of thing a deployment under load turns off.
      */
     unsigned char access_log;
+
+    /**
+     * If a line describing each of the errors that are answered
+     * should be written to the standard output, one is written
+     * per error and so a deployment that is asked over and over
+     * for what is not there pays a call into the kernel for each
+     * of them, the very way the request log costs one.
+     */
+    unsigned char error_log;
 
     /**
      * The default virtual host to be used in any
@@ -1643,7 +1661,7 @@ ERROR_CODE add_http_handler_service(struct service_t *service, struct http_handl
 ERROR_CODE remove_http_handler_service(struct service_t *service, struct http_handler_t *http_handler);
 ERROR_CODE get_http_handler_service(struct service_t *service, struct http_handler_t **http_handler_pointer, unsigned char *name);
 ERROR_CODE _open_service(struct service_t *service);
-void _bundled_path_service(unsigned char *path, const char *name, const char *fallback);
+ERROR_CODE _bundled_path_service(unsigned char *path, const char *name, const char *fallback);
 ERROR_CODE _default_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _file_options_service(struct service_t *service, struct hash_map_t *arguments);
 ERROR_CODE _comand_line_options_service(struct service_t *service, struct hash_map_t *arguments);
