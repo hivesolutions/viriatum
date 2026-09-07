@@ -60,6 +60,14 @@ struct http_connection_t;
 #define CACHE_VALID_HANDLER_FILE 4
 
 /**
+ * The number of listings that the handler is allowed to
+ * keep rendered at the same time, a directory falls on
+ * exactly one of the entries and takes it over from
+ * whatever was sitting there before.
+ */
+#define CACHE_LISTINGS_HANDLER_FILE 32
+
+/**
  * Structure describing a file that the handler has
  * open, so that the serving of it again costs neither
  * the opening of it nor the describing of it, which
@@ -119,14 +127,6 @@ typedef struct file_cache_t {
      */
     struct file_cache_entry_t *entries;
 } file_cache;
-
-/**
- * The number of listings that the handler is allowed to
- * keep rendered at the same time, a directory falls on
- * exactly one of the entries and takes it over from
- * whatever was sitting there before.
- */
-#define CACHE_LISTINGS_HANDLER_FILE 32
 
 /**
  * Structure describing the page of a directory that the
