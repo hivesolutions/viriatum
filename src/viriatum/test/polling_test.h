@@ -59,7 +59,8 @@ const char *test_polling_write(void);
  * Tests the sending of the values queued on a connection, the
  * headers of a response and the payload behind them going out
  * together and a value too large for the socket waiting with
- * what is left of it.
+ * what is left of it, where the socket takes less than the whole
+ * of it at once.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
