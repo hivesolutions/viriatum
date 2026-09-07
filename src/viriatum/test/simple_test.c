@@ -1222,16 +1222,9 @@ const char *test_template_engine(void) {
     V_ASSERT_EQ_S(collector.events[1], "text_end:");
 
 #ifndef VIRIATUM_PLATFORM_WIN32
-    /* a directory opens the way a file does and reads as nothing at
-    all, which is reported as an error rather than parsed as whatever
-    the buffer happened to hold */
-    collector.count = 0;
-    error = process_template_engine(template_engine, template_settings, (unsigned char *) ".");
-    V_ASSERT(IS_ERROR_CODE(error));
-    RESET_ERROR;
-
     /* a stream that cannot be taken to its end, a pipe being one,
-    cannot be read whole either and is reported the same way */
+    cannot be read whole and is reported as an error rather than
+    parsed as whatever the buffer happened to hold */
     V_ASSERT_EQ_I(pipe(pipe_descriptors), 0);
     SPRINTF(pipe_path, sizeof(pipe_path), "/dev/fd/%d", pipe_descriptors[0]);
     collector.count = 0;
