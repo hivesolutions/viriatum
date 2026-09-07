@@ -342,6 +342,34 @@ const char *test_polling_write(void) {
     return NULL;
 }
 
+/**
+ * Reads from the provided socket the number of bytes asked for, the
+ * loopback of some of the platforms delivering them a moment after
+ * they were sent, so a read that comes back with nothing or with only
+ * a part of them is tried again a bounded number of times.
+ *
+ * @param socket_handle The socket to be read from.
+ * @param buffer The buffer the bytes are read into.
+ * @param size The number of bytes to be read.
+ * @return The number of bytes that were read.
+ */
+static size_t _receive_polling_test(SOCKET_HANDLE socket_handle, unsigned char *buffer, size_t size) {
+    long read_bytes;
+    size_t total = 0;
+    size_t attempt;
+
+    for(attempt = 0; attempt < 1000 && total < size; attempt++) {
+        read_bytes = (long) SOCKET_RECEIVE(socket_handle, (char *) buffer + total, size - total, 0);
+        if(read_bytes > 0) {
+            total += (size_t) read_bytes;
+            continue;
+        }
+        SLEEP(1);
+    }
+
+    return total;
+}
+
 const char *test_polling_gather(void) {
     /* allocates space for the pair of sockets, for the connection built
     over one of them, for the value at the head of its queue, for the
@@ -357,6 +385,7 @@ const char *test_polling_gather(void) {
     unsigned char *large;
     size_t large_size = 1 << 24;
     size_t total = 0;
+    size_t attempt = 0;
     size_t index;
     long read_bytes;
     ERROR_CODE error;
@@ -382,8 +411,7 @@ const char *test_polling_gather(void) {
     V_ASSERT_EQ_U(connection->write_queue->size, 0);
     V_ASSERT_EQ_S(_sent_order, "12");
 
-    read_bytes = (long) SOCKET_RECEIVE(client, (char *) buffer, sizeof(buffer), 0);
-    V_ASSERT_EQ_I((int) read_bytes, 8);
+    V_ASSERT_EQ_U(_receive_polling_test(client, buffer, 8), 8);
     V_ASSERT_MEM(buffer, "HEADBODY", 8);
 
     /* a value larger than the socket takes at once goes out in part
@@ -404,12 +432,14 @@ const char *test_polling_gather(void) {
 
     /* the other end is drained and the sending driven again for as
     long as something is left, every byte arrives in its order and the
-    ones that close the whole of it belong to the value queued last */
+    ones that close the whole of it belong to the value queued last, a
+    moment in which nothing arrives and nothing more may be sent is
+    given to the loopback, which delivers a moment after the sending
+    on some of the platforms, a bounded number of times */
     memset(last, 0, sizeof(last));
-    while(TRUE) {
-        while(TRUE) {
-            read_bytes = (long) SOCKET_RECEIVE(client, (char *) drain, sizeof(drain), 0);
-            if(read_bytes <= 0) { break; }
+    while(total < large_size + 4) {
+        read_bytes = (long) SOCKET_RECEIVE(client, (char *) drain, sizeof(drain), 0);
+        if(read_bytes > 0) {
             if(read_bytes >= 4) {
                 memcpy(last, drain + read_bytes - 4, 4);
             } else {
@@ -419,10 +449,16 @@ const char *test_polling_gather(void) {
                 }
             }
             total += (size_t) read_bytes;
+            attempt = 0;
+            continue;
         }
-        if(connection->write_queue->size == 0) { break; }
-        error = write_handler_stream_io(connection);
-        V_ASSERT(error != 1);
+        if(connection->write_queue->size > 0) {
+            error = write_handler_stream_io(connection);
+            V_ASSERT(error != 1);
+        }
+        SLEEP(1);
+        attempt++;
+        V_ASSERT(attempt < 5000);
     }
     V_ASSERT_EQ_U(total, large_size + 4);
     V_ASSERT_MEM(last, "TAIL", 4);
