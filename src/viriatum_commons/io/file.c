@@ -978,7 +978,15 @@ static void _write_time_file(struct stat *file_stat, struct date_time_t *date_ti
 ERROR_CODE get_write_time_file(char *file_path, struct date_time_t *date_time) {
     struct stat file_stat;
 
-    stat(file_path, &file_stat);
+    /* asks the file system to describe the path, a path that cannot
+    be described has no moment of a last write to report and the
+    description would otherwise be read as it happens to be */
+    if(stat(file_path, &file_stat) != 0) {
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem retrieving file time"
+        );
+    }
     _write_time_file(&file_stat, date_time);
 
     /* raise no error */
@@ -1083,9 +1091,18 @@ ERROR_CODE list_directory_file(char *file_path, struct linked_list_t *entries) {
         and it's last write time, the one description of the entry
         answering both rather than the file being described twice */
         join_path_file(file_path, entity->d_name, entry_full_name);
-        stat(entry_full_name, &entry_stat);
-        entry->size = entry_stat.st_size;
-        _write_time_file(&entry_stat, &entry->time);
+        if(stat(entry_full_name, &entry_stat) == 0) {
+            entry->size = entry_stat.st_size;
+            _write_time_file(&entry_stat, &entry->time);
+        }
+        /* otherwise the entry cannot be described, a link that
+        reaches nothing being one, and it is listed with no size
+        and no moment of a last write rather than with whatever
+        the description happens to hold */
+        else {
+            entry->size = 0;
+            memset(&entry->time, 0, sizeof(entry->time));
+        }
 
         /* calculates the length of the entry name and uses
         it to create the memory space for the entry name and then

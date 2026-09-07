@@ -420,6 +420,16 @@ const char *test_listing_cache_expired(void);
 const char *test_listing_cache_missing(void);
 
 /**
+ * Tests a url that names the folder by more than a path is able
+ * to carry, the name being cut to what fits rather than copied
+ * past the end of it.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_listing_cache_long(void);
+
+/**
  * Tests the clearing of the cache, which releases every page and
  * leaves the cache usable afterwards.
  *

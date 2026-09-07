@@ -179,8 +179,10 @@ static ERROR_CODE _parse_template_cache(struct template_cache_entry_t *entry, si
     /* reads the file whole through the descriptor, at the position
     it starts at rather than at whatever the descriptor has reached,
     a reading cut short would leave the parser running over what the
-    buffer happens to hold past it */
-    buffer = (unsigned char *) MALLOC(size);
+    buffer happens to hold past it, the buffer being one byte more
+    than the file holds so that a file with nothing in it still hands
+    the parser a buffer of its own */
+    buffer = (unsigned char *) MALLOC(size + 1);
     read_bytes = (long) READ_AT(entry->descriptor, buffer, size, 0);
     if(read_bytes < 0 || (size_t) read_bytes != size) {
         FREE(buffer);
@@ -501,8 +503,12 @@ ERROR_CODE acquire_template_cache(struct template_cache_t *template_cache, unsig
         the requests, which costs nothing against the parsing it saves,
         a template written over in place keeps the very same descriptor
         and is told from the one that was parsed by nothing but the
-        size and the moment of the last write it now reports */
+        size and the moment of the last write it now reports, one
+        that answers nothing is let go of along with the tree, so
+        that the request that follows opens the path again rather
+        than asking the very same descriptor once more */
         if(STAT_READ(entry->descriptor, file_stat) != 0) {
+            _empty_template_cache(entry);
             RAISE_ERROR_M(
                 RUNTIME_EXCEPTION_ERROR_CODE,
                 (unsigned char *) "Problem loading template"

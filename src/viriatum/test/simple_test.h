@@ -267,7 +267,9 @@ const char *test_template_cache_replaced(void);
 
 /**
  * Tests that an entry left holding a descriptor which no
- * longer reaches anything answers with an error.
+ * longer reaches anything answers with an error and lets go
+ * of what it held, so that the request that follows opens
+ * the path again.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
@@ -382,7 +384,8 @@ const char *test_normalize_path(void);
 const char *test_count_file(void);
 
 /**
- * Tests the reporting of the moment a file was last written.
+ * Tests the reporting of the moment a file was last written,
+ * together with the file that is not there.
  *
  * @return A message describing the execution of
  * the unit test should describe possible errors.
@@ -397,6 +400,15 @@ const char *test_get_write_time_file(void);
  * the unit test should describe possible errors.
  */
 const char *test_is_directory_file(void);
+
+/**
+ * Tests the walking of a directory, every entry of it described
+ * and the one that cannot be described listed with nothing.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_list_directory_file(void);
 
 /**
  * Tests the describing of the set of entries of a directory as

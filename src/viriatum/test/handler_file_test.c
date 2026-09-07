@@ -2090,6 +2090,10 @@ names every entry between brackets and closes with the count */
 the one before is told apart from one built out of this */
 #define LISTING_CACHE_TEST_OTHER "L:${out value=items /}"
 
+/* a template that carries nothing but the name of the folder being
+listed, so that the name the listing was given is what the page holds */
+#define LISTING_CACHE_TEST_FOLDER "<${out value=folder_path /}>"
+
 /**
  * Builds the caches and the template that the tests of the listing
  * cache render through, together with the file the fixture serves so
@@ -2377,6 +2381,50 @@ const char *test_listing_cache_missing(void) {
     delete_template_handler(template_handler);
     entry = &listing_cache->entries[_calculate_string_hash_map((unsigned char *) LISTING_CACHE_TEST_URL) % CACHE_LISTINGS_HANDLER_FILE];
     V_ASSERT_NULL(entry->page);
+
+    _delete_listing_cache_test(listing_cache, template_cache);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_listing_cache_long(void) {
+    /* allocates space for the caches, for the handler the page is
+    built into, for the url that names the folder by more than a
+    path is able to carry and for the error the rendering raises */
+    struct listing_cache_t *listing_cache;
+    struct template_cache_t *template_cache;
+    struct template_handler_t *template_handler;
+    unsigned char url[VIRIATUM_MAX_URL_SIZE];
+    ERROR_CODE error;
+
+    _create_listing_cache_test(&listing_cache, &template_cache);
+    _write_template_handler_file_test((char *) HANDLER_FILE_TEST_LISTING, LISTING_CACHE_TEST_FOLDER);
+
+    /* a url that names the folder by more than a path is able to
+    carry names it by what fits of it, the copying of the name used
+    to run past the end of it and over whatever sat there */
+    memset(url, 'a', sizeof(url) - 1);
+    url[0] = '/';
+    url[sizeof(url) - 2] = '/';
+    url[sizeof(url) - 1] = '\0';
+    create_template_handler(&template_handler);
+    error = render_listing_cache(
+        listing_cache,
+        template_cache,
+        template_handler,
+        url,
+        (unsigned char *) ".",
+        (unsigned char *) HANDLER_FILE_TEST_LISTING
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(strlen((char *) template_handler->string_value), VIRIATUM_MAX_PATH_SIZE + 1);
+    V_ASSERT(template_handler->string_value[0] == '<');
+    V_ASSERT(template_handler->string_value[1] == 'a');
+    V_ASSERT(template_handler->string_value[VIRIATUM_MAX_PATH_SIZE - 1] == 'a');
+    V_ASSERT(template_handler->string_value[VIRIATUM_MAX_PATH_SIZE] == '>');
+    delete_template_handler(template_handler);
 
     _delete_listing_cache_test(listing_cache, template_cache);
 

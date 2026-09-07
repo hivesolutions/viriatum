@@ -1179,11 +1179,16 @@ static void _render_template_test(struct template_cache_t *template_cache, char 
 
 const char *test_template_engine(void) {
     /* allocates space for the engine, for the settings that send
-    its events to the collector and for the collector itself */
+    its events to the collector, for the collector itself and, on
+    the platforms that have them, for a pipe and the path to it */
     struct template_engine_t *template_engine;
     struct template_settings_t *template_settings;
     struct template_collector_t collector;
     ERROR_CODE error;
+#ifndef VIRIATUM_PLATFORM_WIN32
+    int pipe_descriptors[2];
+    char pipe_path[32];
+#endif
 
     create_template_engine(&template_engine);
     _create_settings_template_test(&template_settings);
@@ -1205,6 +1210,37 @@ const char *test_template_engine(void) {
     V_ASSERT_EQ_S(collector.events[6], "tag_end:${out value=x /}");
     V_ASSERT_EQ_S(collector.events[7], "text_begin:");
     V_ASSERT_EQ_S(collector.events[8], "text_end: b");
+
+    /* a file with nothing in it opens and closes an empty text, the
+    buffer handed to the parser being one of its own even then */
+    write_file((char *) TEMPLATE_TEST_PATH, (unsigned char *) "", 0);
+    collector.count = 0;
+    error = process_template_engine(template_engine, template_settings, (unsigned char *) TEMPLATE_TEST_PATH);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 2);
+    V_ASSERT_EQ_S(collector.events[0], "text_begin:");
+    V_ASSERT_EQ_S(collector.events[1], "text_end:");
+
+#ifndef VIRIATUM_PLATFORM_WIN32
+    /* a directory opens the way a file does and reads as nothing at
+    all, which is reported as an error rather than parsed as whatever
+    the buffer happened to hold */
+    collector.count = 0;
+    error = process_template_engine(template_engine, template_settings, (unsigned char *) ".");
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+
+    /* a stream that cannot be taken to its end, a pipe being one,
+    cannot be read whole either and is reported the same way */
+    V_ASSERT_EQ_I(pipe(pipe_descriptors), 0);
+    SPRINTF(pipe_path, sizeof(pipe_path), "/dev/fd/%d", pipe_descriptors[0]);
+    collector.count = 0;
+    error = process_template_engine(template_engine, template_settings, (unsigned char *) pipe_path);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+    close(pipe_descriptors[0]);
+    close(pipe_descriptors[1]);
+#endif
 
     /* a file that is not there is not an error, the parsing simply
     reports nothing at all, which is what leaves a page empty */
@@ -1338,6 +1374,23 @@ const char *test_template_engine_buffer(void) {
     V_ASSERT_EQ_S(collector.events[5], "parameter_value:1");
     V_ASSERT_EQ_S(collector.events[6], "tag_end:${out value=1 /}");
     V_ASSERT_EQ_S(collector.events[8], "text_end:");
+
+    /* a dollar that no brace follows opens no tag and is part of the
+    text, whether it sits inside it or on the very last character of
+    the buffer, the parsing used to leave the machine waiting for the
+    brace at the end and lose the whole of the text before it */
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "a $5 b", 6);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 2);
+    V_ASSERT_EQ_S(collector.events[1], "text_end:a $5 b");
+
+    collector.count = 0;
+    error = process_buffer_template_engine(template_engine, template_settings, (unsigned char *) "price: $", 8);
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT_EQ_U(collector.count, 2);
+    V_ASSERT_EQ_S(collector.events[0], "text_begin:");
+    V_ASSERT_EQ_S(collector.events[1], "text_end:price: $");
 
     /* a buffer with nothing in it opens and closes an empty text and
     reads nothing at all past its end */
@@ -1846,10 +1899,20 @@ const char *test_template_cache_stale(void) {
     V_ASSERT(IS_ERROR_CODE(error));
     RESET_ERROR;
 
-    /* the descriptor is unset by hand as the cache is no longer able
-    to close what it was left holding, the tree it still holds is
-    released along with the cache */
-    entry->descriptor = -1;
+    /* the entry lets go of the descriptor and of the tree it held,
+    so that the request that follows opens the path again and is
+    served rather than failing for as long as the cache lives */
+    V_ASSERT_EQ_I(entry->descriptor, -1);
+    V_ASSERT_NULL(entry->root);
+    V_ASSERT_NULL(entry->nodes);
+    error = acquire_template_cache(
+        template_cache,
+        (unsigned char *) TEMPLATE_TEST_PATH,
+        &entry
+    );
+    V_ASSERT_EQ_U(error, 0);
+    V_ASSERT(entry->descriptor != -1);
+    V_ASSERT_NOT_NULL(entry->root);
 
     delete_template_cache(template_cache);
     remove(TEMPLATE_TEST_PATH);
@@ -2438,21 +2501,36 @@ const char *test_count_file(void) {
 
 const char *test_get_write_time_file(void) {
     /* allocates space for the moment of the last write that the
-    describing reports and for the error it raises */
+    describing reports, for the moment the test is running at and
+    for the error the describing raises */
     struct date_time_t date_time;
+    struct tm now_time;
+    time_t now;
     ERROR_CODE error;
 
     /* a file that has just been written was written in the year the
     test is running in, whatever the clock of the machine says of the
-    hour, and never in the very first one a moment is able to name */
+    hour, the year on either side of it being allowed for a test that
+    runs as the year turns, and never in the very first one a moment
+    is able to name */
+    now = time(NULL);
+    GM_TIME(&now_time, &now);
     write_file((char *) "./viriatum_write_time_test.txt", (unsigned char *) "viriatum", 8);
     memset(&date_time, 0, sizeof(date_time));
     error = get_write_time_file((char *) "./viriatum_write_time_test.txt", &date_time);
     V_ASSERT_EQ_U(error, 0);
-    V_ASSERT(date_time.year >= 2026);
+    V_ASSERT(date_time.year >= now_time.tm_year + 1900 - 1);
+    V_ASSERT(date_time.year <= now_time.tm_year + 1900 + 1);
     V_ASSERT(date_time.month >= 1 && date_time.month <= 12);
     V_ASSERT(date_time.day >= 1 && date_time.day <= 31);
     remove("./viriatum_write_time_test.txt");
+
+    /* a file that is not there has no moment of a last write to
+    report, which is an error rather than whatever the description
+    of it happened to hold */
+    error = get_write_time_file((char *) "./viriatum_write_time_gone.txt", &date_time);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -2484,6 +2562,76 @@ const char *test_is_directory_file(void) {
     error = is_directory_file((char *) "./viriatum_directory_gone", &is_directory);
     V_ASSERT_EQ_U(error, 0);
     V_ASSERT_EQ_U(is_directory, 0);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
+const char *test_list_directory_file(void) {
+    /* allocates space for the entries that the walking of a directory
+    reports, for the node and the entry being looked at, for the count
+    of the entries that were found and for the error the walking raises */
+    struct linked_list_t *entries;
+    struct linked_list_node_t *node;
+    struct file_t *entry;
+    size_t count = 0;
+    ERROR_CODE error;
+
+    /* builds a directory with a file in it and, on the platforms
+    that have them, with a link that reaches nothing at all */
+#ifdef VIRIATUM_PLATFORM_WIN32
+    _mkdir("./viriatum_list_test");
+#else
+    mkdir("./viriatum_list_test", 0755);
+    symlink("./viriatum_list_missing", "./viriatum_list_test/gone.lnk");
+#endif
+    write_file((char *) "./viriatum_list_test/one.txt", (unsigned char *) "viriatum", 8);
+
+    /* every entry of the directory is listed and described, the file
+    with its size and the moment it was written and the link that
+    reaches nothing with no size and no moment at all rather than
+    with whatever the description of it happened to hold */
+    create_linked_list(&entries);
+    error = list_directory_file((char *) "./viriatum_list_test", entries);
+    V_ASSERT_EQ_U(error, 0);
+    for(node = entries->first; node != NULL; node = node->next) {
+        entry = (struct file_t *) node->value;
+        if(strcmp((char *) entry->name, "one.txt") == 0) {
+            V_ASSERT_EQ_U(entry->type, FILE_TYPE_REGULAR);
+            V_ASSERT_EQ_U(entry->size, 8);
+            V_ASSERT(entry->time.year >= 1970);
+            count++;
+        }
+        if(strcmp((char *) entry->name, "gone.lnk") == 0) {
+            V_ASSERT_EQ_U(entry->type, FILE_TYPE_LINK);
+            V_ASSERT_EQ_U(entry->size, 0);
+            V_ASSERT_EQ_U(entry->time.year, 0);
+            count++;
+        }
+    }
+#ifdef VIRIATUM_PLATFORM_WIN32
+    V_ASSERT_EQ_U(count, 1);
+#else
+    V_ASSERT_EQ_U(count, 2);
+#endif
+    delete_directory_entries_file(entries);
+    delete_linked_list(entries);
+
+    /* a directory that is not there cannot be walked at all */
+    create_linked_list(&entries);
+    error = list_directory_file((char *) "./viriatum_list_gone", entries);
+    V_ASSERT(IS_ERROR_CODE(error));
+    RESET_ERROR;
+    delete_linked_list(entries);
+
+    remove("./viriatum_list_test/one.txt");
+#ifdef VIRIATUM_PLATFORM_WIN32
+    _rmdir("./viriatum_list_test");
+#else
+    remove("./viriatum_list_test/gone.lnk");
+    rmdir("./viriatum_list_test");
+#endif
 
     /* returns the default value, nothing happened so there's
     nothing to report for this execution */
@@ -2686,6 +2834,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_count_file, "path"),
     V_TEST_T(test_get_write_time_file, "path"),
     V_TEST_T(test_is_directory_file, "path"),
+    V_TEST_T(test_list_directory_file, "path"),
     V_TEST_T(test_fingerprint_directory_file, "path"),
     V_TEST_T(test_join_path_file, "path"),
     V_TEST_T(test_absolute_path_file, "path"),
@@ -2726,6 +2875,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_listing_cache_template, "handler"),
     V_TEST_T(test_listing_cache_expired, "handler"),
     V_TEST_T(test_listing_cache_missing, "handler"),
+    V_TEST_T(test_listing_cache_long, "handler"),
     V_TEST_T(test_listing_cache_clear, "handler"),
     V_TEST_T(test_handler_default_response, "handler"),
     V_TEST_T(test_handler_default_close, "handler"),

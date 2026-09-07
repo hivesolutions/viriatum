@@ -79,8 +79,10 @@ static void _render_listing_handler_file(
     struct linked_list_t *directory_entries_map;
 
     /* allocates space for the size of the url string to
-    be calculates and for the folder path variable */
+    be calculates, for the size of the part of it that names
+    the folder and for the folder path variable */
     size_t url_size;
+    size_t folder_size;
     char folder_path[VIRIATUM_MAX_PATH_SIZE];
 
     /* creates the directory entries (linked list) */
@@ -93,14 +95,15 @@ static void _render_listing_handler_file(
 
     /* retrieves the current size of the url and copies into
     the folder path the appropriate part of it, this strategy
-    takes into account the size of the url */
+    takes into account the size of the url, a url that names
+    the folder by more than the folder path is able to carry
+    names it by what fits of it rather than being copied past
+    the end of it */
     url_size = strlen((char *) url);
-    if(url_size > 2) { memcpy(folder_path, &url[1], url_size - 2); }
-    if(url_size > 2) {
-        folder_path[url_size - 2] = '\0';
-    } else {
-        folder_path[0] = '\0';
-    }
+    folder_size = url_size > 2 ? url_size - 2 : 0;
+    if(folder_size >= VIRIATUM_MAX_PATH_SIZE) { folder_size = VIRIATUM_MAX_PATH_SIZE - 1; }
+    memcpy(folder_path, &url[1], folder_size);
+    folder_path[folder_size] = '\0';
 
     /* assigns the name of the current folder being listed to
     the template handler (to be set on the template) */

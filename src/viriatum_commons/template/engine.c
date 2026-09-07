@@ -76,7 +76,9 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
     FILE *file;
 
     /* allocates the space for the variable that will hold
-    the size of the file to be parsed */
+    the size of the file to be parsed and for the position
+    of the end of it, as the stream itself reports it */
+    long file_length;
     size_t file_size;
 
     /* allocates the buffer that will hold the contents
@@ -100,17 +102,28 @@ ERROR_CODE process_template_engine(struct template_engine_t *template_engine, st
 
     /* retrieves the size of the file by seeking to the
     end of it and the seeks the stream back to the initial
-    position (for further reading) */
-    fseek(file, 0, SEEK_END);
-    file_size = ftell(file);
+    position (for further reading), a stream that cannot be
+    taken to its end or is unable to say where that is, as
+    the one of a directory, cannot be read whole */
+    file_length = fseek(file, 0, SEEK_END) == 0 ? ftell(file) : -1;
     fseek(file, 0, SEEK_SET);
+    if(file_length < 0) {
+        fclose(file);
+        RAISE_ERROR_M(
+            RUNTIME_EXCEPTION_ERROR_CODE,
+            (unsigned char *) "Problem reading from file"
+        );
+    }
+    file_size = (size_t) file_length;
 
     /* allocates the buffer that will hold the complete
     template file (this allocation may be giant) and reads
     the file into it whole, a single operation where the
     walking of the stream a character at a time costs a
-    call into the library for every one of them */
-    file_buffer = (unsigned char *) MALLOC(file_size);
+    call into the library for every one of them, one byte
+    more than the file holds so that a file with nothing
+    in it still hands the parser a buffer of its own */
+    file_buffer = (unsigned char *) MALLOC(file_size + 1);
     number_bytes = fread(file_buffer, 1, file_size, file);
 
     /* closes the file, the contents of it are in memory */
@@ -432,9 +445,11 @@ ERROR_CODE process_buffer_template_engine(struct template_engine_t *template_eng
         }
     }
 
-    /* in case the current state is engine
-    normal (there must be text to be flushed) */
-    if(state == TEMPLATE_ENGINE_NORMAL) {
+    /* in case the current state is engine normal (there
+    must be text to be flushed), a dollar that the buffer
+    ends on opens no tag and is the last character of that
+    text rather than the start of something else */
+    if(state == TEMPLATE_ENGINE_NORMAL || state == TEMPLATE_ENGINE_DOLLAR) {
         /* calls the text end callback */
         TEMPLATE_CALLBACK_DATA(text_end);
     }
