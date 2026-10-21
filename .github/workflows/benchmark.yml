@@ -68,10 +68,14 @@ jobs:
           REPEATS: ${{ inputs.repeats || '3' }}
         run: |
           ./scripts/benchmark.sh
+      # a run that failed before the summary was written already failed
+      # on its own step, which is where the reason of it has to show
       - name: Report benchmark
         if: always()
         run: |
-          cat benchmark/summary.md >> "$GITHUB_STEP_SUMMARY"
+          if [ -f benchmark/summary.md ]; then
+            cat benchmark/summary.md >> "$GITHUB_STEP_SUMMARY"
+          fi
       # the baseline is only ever refreshed when it is asked for, a
       # run that recorded itself would let the numbers ratchet down
       # one quiet run at a time and nobody would ever see it happen
