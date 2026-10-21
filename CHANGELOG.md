@@ -96,6 +96,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A discarded measurement no longer shows a tail or a comparison against the baseline - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The client that drives requests by hand runs again on a current Python - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * The harness runs the workloads of the interfaces again on the systems that sign what they load - [#49](https://github.com/hivesolutions/viriatum/issues/49)
+* The scheduled benchmark no longer fails when its proxying reference is built against the newest runtime
+* The benchmark no longer sits idle for minutes each time it is done measuring its proxying reference
 
 ## [0.5.0] - 2026-08-28
 

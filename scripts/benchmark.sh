@@ -251,6 +251,10 @@ PID=""
 PID_REFERENCE=""
 PID_UPSTREAM=""
 
+# the signal the reference is taken down with, the one that asks a
+# reference to finish what it serves is not the same for all of them
+SIGNAL_REFERENCE="TERM"
+
 _stop_subject() {
     if [ -n "$PID" ]; then
         kill "$PID" 2> /dev/null || true
@@ -264,7 +268,7 @@ _stop_subject() {
 
 _stop_reference() {
     if [ -n "$PID_REFERENCE" ]; then
-        kill "$PID_REFERENCE" 2> /dev/null || true
+        kill -s "$SIGNAL_REFERENCE" "$PID_REFERENCE" 2> /dev/null || true
         wait "$PID_REFERENCE" 2> /dev/null || true
         PID_REFERENCE=""
     fi
@@ -566,6 +570,7 @@ _start_reference() {
     # are asked about in different ways
     REFERENCE_CONTAINER=
     PID_REFERENCE=
+    SIGNAL_REFERENCE="TERM"
 
     # the paths inside a container and the ones on the machine differ,
     # the configuration is written against whichever of the two the
@@ -631,6 +636,10 @@ _start_reference() {
                 "127.0.0.1:$PORT_UPSTREAM" \
                 > "$OUTPUT/logs/reference.log" 2>&1 &
             PID_REFERENCE=$!
+            # the graceful terminate of the framework sits out the whole
+            # of its grace period of five minutes no matter what is left
+            # to serve, the interrupt is its shutdown that is immediate
+            SIGNAL_REFERENCE="INT"
             ;;
         gunicorn)
             # the reference is given the shape it was measured to be
