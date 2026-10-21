@@ -14,6 +14,11 @@ publish = false
 [dependencies]
 async-trait = "0.1"
 pingora = { version = "0.8", features = ["lb"] }
+# the runtime is held below 1.54, which refuses the buffer of no size
+# pingora gives every connection it accepts and so takes the service
+# down on the very first one, until pingora stops asking for it
+# (https://github.com/cloudflare/pingora/issues/1059)
+tokio = "~1.53"
 
 [[bin]]
 name = "load_balancer"
