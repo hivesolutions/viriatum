@@ -286,7 +286,7 @@ On Alpine Linux:
 Requires PHP 8.x compiled with the embed SAPI. On Alpine Linux the simplest approach is to use the
 system packages:
 
-    apk add php84-dev php84-embed
+    apk add php85-dev php85-embed
 
 When building PHP from source, compile with embed SAPI support (the library is now named `libphp.so`
 instead of the old `libphp5.so`):
@@ -337,7 +337,7 @@ The module is compiled with flags from `python3-config`:
 It's possible to run viriatum inside a Docker container. Three Dockerfiles are provided:
 
 * `Dockerfile` - Core server only (~11 MB)
-* `Dockerfile.php` - Core + mod_php with PHP 8.4 (~22 MB)
+* `Dockerfile.php` - Core + mod_php with PHP 8.5 (~22 MB)
 * `Dockerfile.all` - All modules: diag, gif, lua, php, python (~112 MB)
 
 To build and run:

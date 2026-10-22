@@ -3,7 +3,7 @@ FROM alpine:latest AS builder
 # install build dependencies for viriatum and PHP 8
 RUN apk update && apk add \
     build-base make autoconf automake libtool \
-    pcre-dev openssl-dev php84-dev php84-embed
+    pcre-dev openssl-dev php85-dev php85-embed
 
 ADD . /viriatum
 RUN rm -rf /viriatum/.git
@@ -15,12 +15,12 @@ RUN cd /viriatum && \
     make && make install
 
 # build and install mod_php module
-# php-config84 --ldflags returns a wrong path on Alpine, so we locate
+# php-config85 --ldflags returns a wrong path on Alpine, so we locate
 # the directory containing libphp.so directly
 RUN cd /viriatum/modules/mod_php && \
     ./autogen.sh && \
     export PHP_LIB_DIR=$(dirname $(find /usr/lib -name "libphp.so" 2>/dev/null | head -1)) && \
-    export PHP_INCLUDES="$(php-config84 --includes)" && \
+    export PHP_INCLUDES="$(php-config85 --includes)" && \
     export CFLAGS="-fcommon -D_GNU_SOURCE ${PHP_INCLUDES}" && \
     export CPPFLAGS="-D_GNU_SOURCE ${PHP_INCLUDES}" && \
     export LDFLAGS="-L${PHP_LIB_DIR}" && \
@@ -40,7 +40,7 @@ LABEL org.opencontainers.image.licenses="Apache-2.0"
 
 EXPOSE 9090
 
-RUN apk add --no-cache pcre libssl3 libcrypto3 php84-embed
+RUN apk add --no-cache pcre libssl3 libcrypto3 php85-embed
 
 COPY --from=builder /usr/bin/viriatum /usr/bin/viriatum
 COPY --from=builder /usr/lib/libviriatum.so.1.0.0 /usr/lib/libviriatum.so.1.0.0
@@ -53,7 +53,7 @@ RUN ln -s libviriatum.so.1.0.0 /usr/lib/libviriatum.so.1 && \
     ln -s libviriatum.so.1.0.0 /usr/lib/libviriatum.so && \
     ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so.1 && \
     ln -s libviriatum_http.so.1.0.0 /usr/lib/libviriatum_http.so && \
-    ln -sf /usr/lib/php84/libphp.so /usr/lib/libphp.so
+    ln -sf /usr/lib/php85/libphp.so /usr/lib/libphp.so
 
 RUN addgroup -S viriatum && adduser -S viriatum -G viriatum && \
     chown -R viriatum:viriatum /etc/viriatum /var/viriatum
