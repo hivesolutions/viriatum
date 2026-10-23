@@ -31,7 +31,7 @@ CMake gathers the sources of the tree through a pattern and so it picks a new fi
 
 A suite carries two more, `src/viriatum/test/simple_test.c` has to include the header of it and to name every one of its tests in the registry that closes that file.
 
-The packaging for Python builds through CMake and so needs nothing of its own. The fuzz targets are the single deliberate exception to all of the above, they carry an entry point of their own and are named by no project.
+The packaging for Python builds through CMake and so needs nothing of its own. The fuzz targets and the suites of the modules (`viriatum_mod_lua_test`, `viriatum_mod_php_test` and `viriatum_mod_python_test`) are the deliberate exceptions to all of the above, they carry an entry point of their own and are built by CMake alone, so none of the other projects names their sources.
 
 ## Formatting
 
