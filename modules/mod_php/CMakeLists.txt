@@ -30,7 +30,12 @@ if(PHP_CONFIG)
                 break()
             endif()
         endforeach()
-        if(EXISTS "${PHP_PREFIX}/include/php/sapi/embed/php_embed.h" AND PHP_LIB_FOUND)
+
+        # searches for the embed header under the include directory that
+        # php-config reports, distributions version it by the API of PHP
+        # (eg: include/php/20230831) rather than keeping it under the prefix
+        execute_process(COMMAND ${PHP_CONFIG} --include-dir OUTPUT_VARIABLE PHP_INCLUDE_DIR OUTPUT_STRIP_TRAILING_WHITESPACE)
+        if(EXISTS "${PHP_INCLUDE_DIR}/sapi/embed/php_embed.h" AND PHP_LIB_FOUND)
             set(PHP_FOUND TRUE)
             execute_process(COMMAND ${PHP_CONFIG} --includes OUTPUT_VARIABLE PHP_INCLUDES_RAW OUTPUT_STRIP_TRAILING_WHITESPACE)
             string(REGEX MATCHALL "-I[^ ]+" PHP_INCLUDE_FLAGS "${PHP_INCLUDES_RAW}")
