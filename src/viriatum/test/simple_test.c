@@ -2973,6 +2973,7 @@ static struct test_entry_t _simple_entries[] = {
     V_TEST_T(test_websocket_close_code, "websocket"),
     V_TEST_T(test_dispatch_handler_context_keepalive, "handler"),
     V_TEST_T(test_dispatch_handler_response, "handler"),
+    V_TEST_T(test_create_service, "service"),
     V_TEST_T(test_delete_service, "service"),
     V_TEST_T(test_create_service_options, "service"),
     V_TEST_T(test_base_path_service, "service"),

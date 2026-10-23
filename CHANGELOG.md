@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Reports of the serving measured against the reference servers, kept as documents - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Setting that turns the line written for each error that is answered off - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Continuous integration now fails on every run, rather than now and then, when a test reads memory that was never written
 
 ### Changed
 
@@ -99,6 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * The scheduled benchmark no longer fails when its proxying reference is built against the newest runtime
 * The benchmark no longer sits idle for minutes each time it is done measuring its proxying reference
 * Docker images of the PHP and full variants now carry PHP 8.5.12, which closes the two flaws that let a request run code on the interpreter (GHSA-w8hw-w9fx-j79w and GHSA-6wmf-4rv5-p3rp)
+* The tests of the listing of a directory no longer fail now and then on the integration
 * A PHP request for a script that cannot be opened is answered with an error again rather than bringing the whole server down - [#82](https://github.com/hivesolutions/viriatum/issues/82)
 
 ## [0.5.0] - 2026-08-28

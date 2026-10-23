@@ -47,6 +47,8 @@ jobs:
           ./configure
           make
       - name: Test Viriatum
+        env:
+          MALLOC_PERTURB_: 164
         run: |
           ./src/viriatum/viriatum --test
   build-clang:
@@ -66,6 +68,8 @@ jobs:
           CC=clang ./configure
           make
       - name: Test Viriatum
+        env:
+          MALLOC_PERTURB_: 164
         run: |
           ./src/viriatum/viriatum --test
   build-gcc-cmake:
@@ -104,6 +108,8 @@ jobs:
           cmake . -DCMAKE_TOOLCHAIN_FILE=conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
           make
       - name: Test Viriatum
+        env:
+          MALLOC_PERTURB_: 164
         run: |
           ./bin/viriatum --test --test-format=junit --test-output=test-results.xml
       - name: Test Viriatum Mod Python

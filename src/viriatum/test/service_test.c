@@ -26,6 +26,46 @@
 
 #include "service_test.h"
 
+const char *test_create_service(void) {
+    /* allocates space for the service structure
+    to be used in the test */
+    struct service_t *service;
+
+    /* creates the service and verifies that the values describing the
+    build are unset until they are loaded, the description included
+    as every response carries it as the server that answered, one
+    that was left alone used to send whatever the memory held */
+    create_service(&service, (unsigned char *) "test", (unsigned char *) "test");
+
+    V_ASSERT_EQ_S((char *) service->name, "test");
+    V_ASSERT_NULL(service->version);
+    V_ASSERT_NULL(service->platform);
+    V_ASSERT_NULL(service->flags);
+    V_ASSERT_NULL(service->polling_name);
+    V_ASSERT_NULL(service->compiler);
+    V_ASSERT_NULL(service->compiler_version);
+    V_ASSERT_NULL(service->compilation_date);
+    V_ASSERT_NULL(service->compilation_time);
+    V_ASSERT_NULL(service->compilation_flags);
+    V_ASSERT_EQ_S((char *) service->modules, "");
+    V_ASSERT_EQ_S((char *) service->description, "");
+    V_ASSERT_EQ_S((char *) service->program_name, "test");
+    V_ASSERT_EQ_U(service->status, STATUS_CLOSED);
+
+    /* loading the specifications of the build is what describes the
+    service, the description opening with its name and version */
+    load_specifications(service);
+    V_ASSERT_EQ_S((char *) service->version, VIRIATUM_VERSION);
+    V_ASSERT_MEM(service->description, "test/" VIRIATUM_VERSION " (", strlen("test/" VIRIATUM_VERSION " ("));
+
+    /* deletes the service */
+    delete_service(service);
+
+    /* returns the default value, nothing happened so there's
+    nothing to report for this execution */
+    return NULL;
+}
+
 const char *test_delete_service(void) {
     /* deletes an unset service reference, this should be
     a no operation instead of an invalid memory access */
