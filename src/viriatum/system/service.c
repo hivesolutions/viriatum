@@ -84,6 +84,17 @@ void create_service(struct service_t **service_pointer, unsigned char *name, uns
 
     /* sets the service attributes (default) values */
     service->name = name;
+    service->version = NULL;
+    service->platform = NULL;
+    service->flags = NULL;
+    service->polling_name = NULL;
+    service->compiler = NULL;
+    service->compiler_version = NULL;
+    service->compilation_date = NULL;
+    service->compilation_time = NULL;
+    service->compilation_flags = NULL;
+    service->modules[0] = '\0';
+    service->description[0] = '\0';
     service->program_name = program_name;
     service->status = STATUS_CLOSED;
     service->configuration = NULL;
