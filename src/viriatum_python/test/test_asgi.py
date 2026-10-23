@@ -49,6 +49,7 @@ from typing import Any
 from unittest import TestCase, main, skipIf
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
+from warnings import catch_warnings, simplefilter
 
 import viriatum
 
@@ -1600,6 +1601,60 @@ class LifespanTest(TestCase):
             asyncio.sleep = original
         self.assertEqual(failed, [0, 1], "the slices of both events never failed")
         self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+
+    def test_lifespan_slice_failure(self) -> None:
+        # verifies that a slice of the loop that fails before the loop
+        # takes its coroutine over leaves none behind that was never
+        # awaited, the warning of one runs at whatever moment it is
+        # collected and an interrupt that lands there is swallowed
+        events = []
+        failed = []
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        original = asyncio.new_event_loop
+
+        def new_event_loop() -> Any:
+            # fails the first running of each of the two events before
+            # the coroutine handed to it is ever wrapped into a task,
+            # only the waits of the lifespan reach this as the serving
+            # loop advances the loop through another operation
+            loop = original()
+            run_until_complete = loop.run_until_complete
+
+            def run(*args: Any, **kwargs: Any) -> Any:
+                if len(events) not in failed:
+                    failed.append(len(events))
+                    raise RuntimeError("intentional failure")
+                return run_until_complete(*args, **kwargs)
+
+            loop.run_until_complete = run
+            return loop
+
+        asyncio.new_event_loop = new_event_loop
+        try:
+            with catch_warnings(record=True) as caught:
+                simplefilter("always")
+                self._serve(application, PORT + 13)
+                collect()
+        finally:
+            asyncio.new_event_loop = original
+        self.assertEqual(failed, [0, 1], "the slices of both events never failed")
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+        messages = [str(item.message) for item in caught]
+        never = [message for message in messages if "never awaited" in message]
+        self.assertEqual(never, [], "a coroutine was left that was never awaited")
 
     def test_lifespan_liveness_failure(self) -> None:
         # verifies that a task whose liveness is unable to be read

@@ -163,14 +163,25 @@ ERROR_CODE run_slice_loop_python(struct loop_python_t *loop_python, double timeo
         );
     }
     result = PyObject_CallMethod(loop_python->loop, "run_until_complete", "O", sleep);
-    Py_DECREF(sleep);
     if(result == NULL) {
+        /* clears the error first, the trace of it holds the coroutine
+        as well, and then closes the coroutine in case the reference
+        held here is the only one left, the running failed before the
+        loop took it over and it was never awaited, one that reaches
+        the collector as such runs the warning of it at whatever moment
+        it is collected, swallowing an interrupt that lands there */
         _clear_loop_python();
+        if(Py_REFCNT(sleep) == 1) {
+            Py_XDECREF(PyObject_CallMethod(sleep, "close", NULL));
+            _clear_loop_python();
+        }
+        Py_DECREF(sleep);
         RAISE_ERROR_M(
             RUNTIME_EXCEPTION_ERROR_CODE,
             (unsigned char *) "Problem running the event loop"
         );
     }
+    Py_DECREF(sleep);
     Py_DECREF(result);
 
     /* raises no error */
