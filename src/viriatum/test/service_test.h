@@ -42,6 +42,15 @@
 #define VIRIATUM_TEST_ADDRESS "192.0.2.1"
 
 /**
+ * Tests that the service is created with every one of the
+ * values describing the build unset until they are loaded.
+ *
+ * @return A message describing the execution of
+ * the unit test should describe possible errors.
+ */
+const char *test_create_service(void);
+
+/**
  * Tests that the service deletion tolerates an
  * unset (null) service reference.
  *
