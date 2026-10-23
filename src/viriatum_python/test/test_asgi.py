@@ -38,7 +38,7 @@ from hashlib import sha1
 from http.client import HTTPConnection
 from os import urandom
 from shutil import which
-from signal import SIGINT, raise_signal
+from signal import SIGINT, default_int_handler, getsignal, raise_signal, signal
 from socket import SO_LINGER, SOL_SOCKET, create_connection
 from struct import pack, unpack
 from subprocess import PIPE, Popen
@@ -1815,6 +1815,196 @@ class LifespanTest(TestCase):
             finished.set()
         self.assertFalse(state["expired"], "the interrupt was ignored")
         self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+
+    @skipIf(
+        platform == "win32" and version_info < (3, 11),
+        "the interrupt is not delivered reliably by that runtime",
+    )
+    def test_lifespan_interrupt_recorded(self) -> None:
+        # verifies that an interrupt is never raised in the middle of the
+        # code the event loop runs, the application keeps running code of
+        # the interpreter while the signal is raised and gets to finish
+        # it, the serving is then ended by the interrupt out of the loop,
+        # one raised inside of it leaves the loop half way through
+        events = []
+        state = {"completed": False, "expired": False}
+        started = Event()
+        finished = Event()
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    # keeps running code of the interpreter for a while
+                    # once the signal is raised, the very code that the
+                    # default handler would raise the interrupt in
+                    started.set()
+                    deadline = time() + 0.5
+                    while time() < deadline:
+                        pass
+                    state["completed"] = True
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        server = viriatum.Server(application, port=PORT + 14, interface="asgi")
+
+        def interrupt() -> None:
+            started.wait(timeout=10.0)
+            raise_signal(SIGINT)
+            if not finished.wait(timeout=10.0):
+                state["expired"] = True
+                server.stop()
+
+        Thread(target=interrupt, daemon=True).start()
+        try:
+            self.assertRaises(KeyboardInterrupt, server.serve_forever)
+        finally:
+            finished.set()
+        self.assertFalse(state["expired"], "the interrupt was ignored")
+        self.assertTrue(state["completed"], "the interrupt landed in the application")
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+        self.assertIs(getsignal(SIGINT), default_int_handler)
+
+    @skipIf(
+        platform == "win32" and version_info < (3, 11),
+        "the interrupt is not delivered reliably by that runtime",
+    )
+    def test_lifespan_interrupt_twice(self) -> None:
+        # verifies that a second interrupt raised while the first one is
+        # still waiting to be acted upon is raised right away, which is
+        # what ends the serving of an application that blocks the loop
+        state = {"completed": False, "expired": False}
+        started = Event()
+        finished = Event()
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                if message["type"] == "lifespan.startup":
+                    # blocks the loop for far longer than the test is
+                    # willing to wait, only an interrupt ends it
+                    started.set()
+                    deadline = time() + 10.0
+                    while time() < deadline:
+                        pass
+                    state["completed"] = True
+                    await send({"type": "lifespan.startup.complete"})
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        server = viriatum.Server(application, port=PORT + 15, interface="asgi")
+
+        def interrupt() -> None:
+            started.wait(timeout=10.0)
+            raise_signal(SIGINT)
+            sleep(0.2)
+            raise_signal(SIGINT)
+            if not finished.wait(timeout=20.0):
+                state["expired"] = True
+                server.stop()
+
+        initial = time()
+        Thread(target=interrupt, daemon=True).start()
+        try:
+            self.assertRaises(KeyboardInterrupt, server.serve_forever)
+        finally:
+            finished.set()
+        self.assertFalse(state["expired"], "the interrupt was ignored")
+        self.assertFalse(state["completed"], "the application was never interrupted")
+        self.assertTrue(time() - initial < 5.0, "the interrupt was raised late")
+        self.assertIs(getsignal(SIGINT), default_int_handler)
+
+    def test_lifespan_interrupt_custom(self) -> None:
+        # verifies that a handler of the interrupt that is set before the
+        # serving is left in place, only the default one is ever replaced
+        seen = []
+        completed = Event()
+
+        def handler(signum: int, frame: Any) -> None:
+            pass
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                if message["type"] == "lifespan.startup":
+                    seen.append(getsignal(SIGINT))
+                    await send({"type": "lifespan.startup.complete"})
+                    completed.set()
+                elif message["type"] == "lifespan.shutdown":
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        server = viriatum.Server(application, port=PORT + 16, interface="asgi")
+
+        def stop() -> None:
+            completed.wait(timeout=10.0)
+            server.stop()
+
+        previous = signal(SIGINT, handler)
+        try:
+            Thread(target=stop, daemon=True).start()
+            server.serve_forever()
+            self.assertIs(getsignal(SIGINT), handler)
+        finally:
+            signal(SIGINT, previous)
+        self.assertEqual(seen, [handler])
+
+    @skipIf(
+        platform == "win32" and version_info < (3, 11),
+        "the interrupt is not delivered reliably by that runtime",
+    )
+    def test_lifespan_interrupt_restored(self) -> None:
+        # verifies that the default handler of the interrupt is replaced
+        # for the duration of the serving and given back once it is over,
+        # together with an interrupt that was recorded while the serving
+        # was coming to an end and was never acted upon by it
+        events = []
+        seen = []
+        completed = Event()
+
+        async def application(scope: Scope, receive: Receive, send: Send) -> None:
+            if scope["type"] != "lifespan":
+                await self._plain(receive, send)
+                return
+            while True:
+                message = await receive()
+                events.append(message["type"])
+                if message["type"] == "lifespan.startup":
+                    seen.append(getsignal(SIGINT))
+                    await send({"type": "lifespan.startup.complete"})
+                    completed.set()
+                elif message["type"] == "lifespan.shutdown":
+                    raise_signal(SIGINT)
+                    await send({"type": "lifespan.shutdown.complete"})
+                    return
+
+        server = viriatum.Server(application, port=PORT + 17, interface="asgi")
+
+        def stop() -> None:
+            completed.wait(timeout=10.0)
+            server.stop()
+
+        Thread(target=stop, daemon=True).start()
+        with self.assertRaises(KeyboardInterrupt):
+            self.assertIsNone(server.serve_forever())
+            sleep(1.0)
+        self.assertEqual(len(seen), 1)
+        self.assertIsNot(seen[0], default_int_handler)
+        self.assertEqual(events, ["lifespan.startup", "lifespan.shutdown"])
+        self.assertIs(getsignal(SIGINT), default_int_handler)
 
     def test_lifespan_unsupported(self) -> None:
         # verifies that an application that refuses the lifespan

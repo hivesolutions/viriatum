@@ -104,6 +104,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * A PHP request for a script that cannot be opened is answered with an error again rather than bringing the whole server down - [#82](https://github.com/hivesolutions/viriatum/issues/82)
 * The PHP module is found on the systems that keep its headers under a versioned directory, and is now part of the coverage report
 * An interrupt of a server running a Python application is no longer lost now and then after the startup or shutdown of the application failed to be waited for
+* Interrupting a server that runs an ASGI application no longer leaves its event loop half way through, which crashed the process now and then on Windows - [#88](https://github.com/hivesolutions/viriatum/issues/88)
 
 ## [0.5.0] - 2026-08-28
 

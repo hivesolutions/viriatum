@@ -28,6 +28,11 @@
 #include "handler.h"
 #include "handler_asgi.h"
 
+/* flag controlling if an interrupt has been recorded by the handler
+that the serving of an asgi application puts in place of the default
+one, the serving loop is the one acting upon it out of the event loop */
+static char _interrupt_server_python = FALSE;
+
 static char _is_asgi_server_python(PyObject *application) {
     /* allocates space for the various objects used during the
     inspection of the application that has been provided */
@@ -273,12 +278,123 @@ static void _dealloc_server_python(PyObject *self) {
     Py_DECREF(type);
 }
 
+static PyObject *_interrupt_handler_server_python(PyObject *self, PyObject *args) {
+    /* in case an interrupt is already waiting to be acted upon the event
+    loop is not giving the control back, an application that blocks it
+    being the usual reason, and so this one is raised right away the
+    very way the default handler would have raised it */
+    if(_interrupt_server_python == TRUE) {
+        PyErr_SetNone(PyExc_KeyboardInterrupt);
+        return NULL;
+    }
+
+    /* records the interrupt rather than raising it, one raised by the
+    default handler lands in the middle of the event loop and leaves it
+    half way through whatever it was doing, the proactor of windows with
+    an operation that is still pending in the kernel, the serving loop
+    raises it instead once the event loop is no longer running */
+    _interrupt_server_python = TRUE;
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
+static PyMethodDef _interrupt_method_server_python = {
+    "interrupt",
+    _interrupt_handler_server_python,
+    METH_VARARGS,
+    "Records an interrupt of the serving."
+};
+
+static PyObject *_hold_interrupt_server_python(void) {
+    /* allocates space for the signal module, for the handlers of the
+    interrupt (the one in place, the default one and the one replacing
+    it) and for the result of the replacing */
+    PyObject *module;
+    PyObject *current;
+    PyObject *standard;
+    PyObject *handler;
+    PyObject *result;
+
+    /* retrieves both the handler of the interrupt that is in place and
+    the default one, a handler that the application has set is left as
+    it is, as is the default one of a module that cannot be loaded */
+    module = PyImport_ImportModule("signal");
+    if(module == NULL) {
+        _clear_loop_python();
+        return NULL;
+    }
+    current = PyObject_CallMethod(module, "getsignal", "i", SIGINT);
+    standard = PyObject_GetAttrString(module, "default_int_handler");
+    if(current == NULL || standard == NULL || current != standard) {
+        _clear_loop_python();
+        Py_XDECREF(current);
+        Py_XDECREF(standard);
+        Py_DECREF(module);
+        return NULL;
+    }
+    Py_DECREF(standard);
+
+    /* replaces the default handler by the one that records the interrupt,
+    which is only allowed from the main thread, a serving that runs out
+    of any other one never receives the interrupt in the first place */
+    handler = PyCFunction_New(&_interrupt_method_server_python, NULL);
+    result = handler == NULL ? NULL : PyObject_CallMethod(module, "signal", "iO", SIGINT, handler);
+    Py_XDECREF(handler);
+    Py_DECREF(module);
+    if(result == NULL) {
+        _clear_loop_python();
+        Py_DECREF(current);
+        return NULL;
+    }
+    Py_DECREF(result);
+
+    /* starts with no interrupt recorded and returns the handler that has
+    been replaced, so that it is given back once the serving is over */
+    _interrupt_server_python = FALSE;
+    return current;
+}
+
+static void _release_interrupt_server_python(PyObject *handler) {
+    /* allocates space for the signal module the handler is given back
+    through and for the interrupt recorded and never acted upon */
+    PyObject *module;
+    char interrupted;
+
+    /* in case the handler was left in place there is nothing at all to
+    be given back */
+    if(handler == NULL) { return; }
+
+    /* gives back the handler that was replaced, then gives back to the
+    interpreter an interrupt that was recorded and never acted upon, the
+    handler it now has in place being the one that raises it, the record
+    is emptied first so that an interrupt arriving while the handler is
+    being replaced is recorded as well rather than raised */
+    interrupted = _interrupt_server_python;
+    _interrupt_server_python = FALSE;
+    module = PyImport_ImportModule("signal");
+    if(module == NULL) {
+        _clear_loop_python();
+    } else {
+        Py_XDECREF(PyObject_CallMethod(module, "signal", "iO", SIGINT, handler));
+        _clear_loop_python();
+        Py_DECREF(module);
+    }
+    Py_DECREF(handler);
+    if(interrupted == FALSE && _interrupt_server_python == FALSE) { return; }
+    _interrupt_server_python = FALSE;
+    PyErr_SetInterrupt();
+}
+
 static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
     /* allocates space for the exception raised by a signal, it must
     be saved while the shutdown of the lifespan is running */
     PyObject *type;
     PyObject *value;
     PyObject *traceback;
+
+    /* allocates space for the handler of the interrupt that the serving
+    puts something else in place of, unset in case it was left alone */
+    PyObject *handler = NULL;
 
     /* retrieves the reference to the server object and the service
     that is going to be driven by the current loop */
@@ -301,9 +417,12 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
 
         /* attaches the loop to the current thread, the one that is
         going to advance it, so that the accessors of the asyncio
-        module resolve to it for the application code */
+        module resolve to it for the application code, and puts the
+        handler that records the interrupt in place of the default one,
+        so that it is never raised in the middle of the event loop */
         if(server_python->loop_python != NULL) {
             attach_loop_python(server_python->loop_python);
+            handler = _hold_interrupt_server_python();
         }
 
         /* runs the startup event of the lifespan protocol, a failure of
@@ -311,6 +430,7 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
         if(server_python->loop_python != NULL &&
            IS_ERROR_CODE(startup_handler_asgi(service))) {
             close_service(service);
+            _release_interrupt_server_python(handler);
             server_python->opened = FALSE;
             PyErr_SetString(PyExc_RuntimeError, (char *) GET_ERROR());
             return NULL;
@@ -336,9 +456,13 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
                 pending_loop_python(server_python->loop_python) > 0 ? VIRIATUM_ASGI_POLL_TIMEOUT : VIRIATUM_PYTHON_POLL_TIMEOUT;
         }
 
-        /* verifies if a signal has been raised in the meantime, this
-        is what makes the keyboard interrupt work as expected */
-        if(PyErr_CheckSignals() != 0) {
+        /* verifies if a signal has been raised in the meantime or if an
+        interrupt has been recorded, this is what makes the keyboard
+        interrupt work as expected, the recorded one being raised from
+        here, out of the event loop */
+        if(PyErr_CheckSignals() != 0 || _interrupt_server_python == TRUE) {
+            if(!PyErr_Occurred()) { PyErr_SetNone(PyExc_KeyboardInterrupt); }
+            _interrupt_server_python = FALSE;
             stop_service(service);
 
             /* saves the exception raised by the signal so that both
@@ -350,6 +474,7 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
             PyErr_Fetch(&type, &value, &traceback);
             if(server_python->loop_python != NULL) { shutdown_handler_asgi(service); }
             close_service(service);
+            _release_interrupt_server_python(handler);
             PyErr_Restore(type, value, traceback);
             server_python->opened = FALSE;
             return NULL;
@@ -361,6 +486,7 @@ static PyObject *_serve_forever_server_python(PyObject *self, PyObject *args) {
     during the opening of it */
     if(server_python->loop_python != NULL) { shutdown_handler_asgi(service); }
     close_service(service);
+    _release_interrupt_server_python(handler);
     server_python->opened = FALSE;
 
     /* returns the none value as the serving operation finished
