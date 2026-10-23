@@ -612,26 +612,29 @@ ERROR_CODE _send_response_handler_php(struct http_request_t *http_request) {
     this is the main interface for the sapi modules */
     _update_request_php(handler_php_context);
 
-    /* populates the "base" script reference structure
-    with the required value for execution */
-    zend_stream_init_filename(&script, (char *) handler_php_context->file_path);
-
     zend_try {
         /* tries to start the request handling and in case it
         succeeds continues with the execution of it */
         if(php_request_startup() == SUCCESS) {
+            /* populates the "base" script reference structure
+            with the required value for execution, the name of the
+            script is held in the memory of the request so this may
+            only happen once the request has been started */
+            zend_stream_init_filename(&script, (char *) handler_php_context->file_path);
+
             /* executes the script in the current instantiated virtual
             machine, this is a blocking call so it will block the current
             general loop (care is required), then after the execution
-            closes the current request information */
+            destroys the script reference while the memory of the request
+            still stands and closes the current request information */
             php_execute_script(&script);
+            zend_destroy_file_handle(&script);
             php_request_shutdown(NULL);
         }
     }
     zend_catch {
     }
     zend_end_try();
-    zend_destroy_file_handle(&script);
 
     /* retrieves the status code from the sapi headers and converts it
     into the proper status message */
