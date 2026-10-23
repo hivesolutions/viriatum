@@ -108,6 +108,12 @@ CC=/opt/homebrew/opt/llvm/bin/clang LEAKS=1 ./scripts/sanitize.sh
 
 The runner counts the allocations each test leaves outstanding and lists the ones that left the most at the end of a run, which is what points at the test carrying a leak. An allocation that is still outstanding is not necessarily a leak, a value built by one test may well be released by a later one, so the listing narrows the search and the sanitizer settles it. The server counts its own allocations in a debug build too and reports the outstanding ones when the process ends.
 
+The sanitizer does not see a value that is read before it is ever written, which is how a field that the creation of a structure left alone ended up in the headers of every response of the tests and failed them only now and then. The jobs of the integration that build against glibc run the suite with every allocation filled with a byte of its own, so that such a read fails every run rather than whenever the memory happens to hold the wrong thing, and the very same run reproduces one locally:
+
+```bash
+MALLOC_PERTURB_=164 ./bin/viriatum --test
+```
+
 ## Performance
 
 The serving is measured against the reference servers by a harness that starts them all on the same machine, drives them through the same workloads and reports them side by side:

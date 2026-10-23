@@ -35,6 +35,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * Test runs now report which tests left allocations behind them - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Reports of the serving measured against the reference servers, kept as documents - [#49](https://github.com/hivesolutions/viriatum/issues/49)
 * Setting that turns the line written for each error that is answered off - [#77](https://github.com/hivesolutions/viriatum/issues/77)
+* Continuous integration now fails on every run, rather than now and then, when a test reads memory that was never written
 
 ### Changed
 
