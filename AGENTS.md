@@ -31,7 +31,7 @@ CMake gathers the sources of the tree through a pattern and so it picks a new fi
 
 A suite carries two more, `src/viriatum/test/simple_test.c` has to include the header of it and to name every one of its tests in the registry that closes that file.
 
-The packaging for Python builds through CMake and so needs nothing of its own. The fuzz targets are the single deliberate exception to all of the above, they carry an entry point of their own and are named by no project.
+The packaging for Python builds through CMake and so needs nothing of its own. The fuzz targets and the suites of the modules (`viriatum_mod_lua_test`, `viriatum_mod_php_test` and `viriatum_mod_python_test`) are the deliberate exceptions to all of the above, they carry an entry point of their own and are built by CMake alone, so none of the other projects names their sources.
 
 ## Formatting
 
@@ -57,9 +57,10 @@ Run the core test suite and module tests before committing:
 ```bash
 ./bin/viriatum --test
 ./bin/viriatum_mod_lua_test
+./bin/viriatum_mod_php_test
 ```
 
-The mod_lua test binary is only built when LuaJIT is available on the system.
+The mod_lua test binary is only built when LuaJIT is available on the system, and the mod_php one only when `php-config` finds the embed SAPI of PHP.
 
 Tests are described as data, one row per test in a registry table, so that they may be listed, filtered and reported without any of them having to be named in an execution sequence. The table of the core suite lives in `src/viriatum/test/simple_test.c` and a test is added to it by writing the function, declaring it in the matching `*_test.h` and adding a row:
 
@@ -230,7 +231,7 @@ Before committing, ensure that the following items check:
 - [ ] Every build system names a new source file, see [Adding a Source File](#adding-a-source-file)
 - [ ] Code is formatted with `clang-format`, which `./scripts/format.sh` verifies over the whole tree
 - [ ] Tests pass: `./bin/viriatum --test`
-- [ ] Module tests pass (if applicable): `./bin/viriatum_mod_lua_test`
+- [ ] Module tests pass (if applicable): `./bin/viriatum_mod_lua_test` and `./bin/viriatum_mod_php_test`
 - [ ] CHANGELOG.md is updated in [Unreleased] section
 - [ ] No debugging print statements or commented-out code
 - [ ] CRLF line endings are preserved

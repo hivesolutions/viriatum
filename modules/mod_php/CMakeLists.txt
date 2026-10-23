@@ -55,6 +55,32 @@ if(PHP_FOUND)
     )
     target_link_libraries(viriatum_mod_php viriatum_commons ${PHP_LIBRARY})
     message(STATUS "Viriatum: mod_php enabled")
+
+    # test executable: compiles the module sources together with
+    # the test files into a standalone binary that can be invoked
+    # to run the mod_php test suite
+    file(GLOB MOD_PHP_TEST_SOURCES src/viriatum_mod_php/test/*.c)
+    add_executable(viriatum_mod_php_test
+        ${MOD_PHP_SOURCES}
+        ${MOD_PHP_TEST_SOURCES}
+        ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_parser.c
+        ${CMAKE_SOURCE_DIR}/src/viriatum/http/http_request.c
+    )
+    set_target_properties(viriatum_mod_php_test PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin
+        RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin
+    )
+    target_include_directories(viriatum_mod_php_test PRIVATE
+        src/viriatum_mod_php
+        ${CMAKE_SOURCE_DIR}/src/viriatum
+        ${CMAKE_SOURCE_DIR}/src/viriatum_commons
+        ${PHP_INCLUDE_DIRS}
+    )
+    target_link_libraries(viriatum_mod_php_test viriatum_static viriatum_commons ${PHP_LIBRARY})
+    target_compile_definitions(viriatum_mod_php_test PRIVATE
+        VIRIATUM_TEST_CONTENTS_PATH="${CMAKE_SOURCE_DIR}/modules/mod_php/resources/test"
+    )
 else()
     message(STATUS "Viriatum: mod_php disabled (PHP embed SAPI not found)")
 endif()
